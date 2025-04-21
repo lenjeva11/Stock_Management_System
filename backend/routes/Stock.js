@@ -1,25 +1,48 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const Stock = require('../models/Stock');
-const Product = require('../models/Product');
+const Stock = require("../models/Stock");
+const Product = require("../models/Product");
 
+// GET all stock movements
+router.get("/", async (req, res) => {
+  try {
+    const movements = await Stock.find().populate("productId");
+    const formatted = movements.map((m) => ({
+      _id: m._id,
+      productName: m.productId?.name || "Unknown",
+      type: m.type,
+      quantity: m.quantity,
+      date: m.date,
+    }));
 
-//Handle Stock in/out
-router.post('/', async (req, res) =>{
-    const {productId, type, quantity} = req.body;
-    const product = await Product.findById(productId);
+    res.json(formatted);
+  } catch (err) {
+    console.error("Failed to fetch stock:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
-    if (!product) return res.status(404).json({ message: 'Product not found'});
+// POST stock movement
+router.post("/", async (req, res) => {
+  try {
+    const { productId, type, quantity } = req.body;
 
-    const newQty = type === "IN" ? product.quantity + Number(quantity) : product.quantity - Number(quantity);
+    if (!productId || !type || quantity == null) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
-    if (newQty < 0) return res.status(400).json({ message: 'Insufficient Stock'});
+    const newStock = new Stock({
+      productId,
+      type,
+      quantity: Number(quantity),
+    });
 
-    const stock = new Stock({ product: productId, type, quantity });
-    await stock.save();
-
-    
-    res.json(stock);
+    await newStock.save();
+    res.status(201).json(newStock);
+  } catch (err) {
+    console.error("Error saving stock movement:", err);
+    res.status(500).json({ message: "Failed to save stock movement" });
+  }
 });
 
 module.exports = router;

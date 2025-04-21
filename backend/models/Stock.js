@@ -1,10 +1,24 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const stockSchema = new mongoose.Schema({
-    product: {type: mongoose.Schema.Types.ObjectId, ref: 'Product'},
-    type: { type: String, enum:['IN', 'OUT']},
-    quantity: Number,
-    date: { type: Date, default: Date.now}
+const StockSchema = new mongoose.Schema({
+  productId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product",
+    required: true,
+  },
+  type: {
+    type: String,
+    enum: ["in", "out"],
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model('Stock', stockSchema);
+module.exports = mongoose.model("Stock", StockSchema);
