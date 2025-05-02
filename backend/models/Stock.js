@@ -12,7 +12,7 @@ const StockSchema = new mongoose.Schema({
   // Type of stock movement: "in" or "out", required field
   type: {
     type: String,
-    enum: ["in", "out"],
+    enum: ["In", "Out"],
     required: true,
   },
   // Quantity of stock moved, required field
