@@ -1,100 +1,85 @@
-// Import React and hooks for state and lifecycle management
 import React, { useEffect, useState } from "react";
-// Import Table component for displaying data
 import Table from "../components/Table";
-// Import Modal component for form dialogs
 import Modal from "../components/Modal";
 
-// Define Stock functional component
 const Stock = () => {
-  // State to hold list of products for dropdown
-  const [products, setProducts] = useState([]);
-  // State to hold list of stock movements
   const [movements, setMovements] = useState([]);
-  // State to hold form data for stock movement create
-  const [form, setForm] = useState({
-    productId: "",
-    type: "in",
-    quantity: "",
-  });
-  // State to control visibility of modal dialog
+  const [products, setProducts] = useState([]);
+  const [form, setForm] = useState({ productId: "", type: "in", quantity: "" });
   const [showModal, setShowModal] = useState(false);
 
-  // Fetch products for dropdown
-  const fetchProducts = async () => {
-    const res = await fetch("http://localhost:5000/api/products");
-    const data = await res.json();
-    setProducts(data); // Update products state with fetched data
-  };
-
-  // Fetch stock movements
   const fetchMovements = async () => {
-    const res = await fetch("http://localhost:5000/api/stock");
-    const data = await res.json();
-    setMovements(data); // Update movements state with fetched data
+    try {
+      const res = await fetch("http://localhost:5000/api/stock");
+      const data = await res.json();
+
+      // Format date here
+      const formatted = data.map((m) => ({
+        ...m,
+        date: new Date(m.date).toLocaleDateString(undefined, {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+      }));
+
+      setMovements(formatted);
+    } catch (err) {
+      console.error("Error fetching stock movements:", err);
+    }
   };
 
-  // useEffect hook to fetch products and movements on component mount
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/products");
+      const data = await res.json();
+      setProducts(data);
+    } catch (err) {
+      console.error("Error fetching products:", err);
+    }
+  };
+
   useEffect(() => {
-    fetchProducts();
     fetchMovements();
+    fetchProducts();
   }, []);
 
-  // Update form state on input change
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
-  // Handle form submission for creating stock movement
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      // Send POST request to backend API
-      const res = await fetch("http://localhost:5000/api/stock", {
+      await fetch("http://localhost:5000/api/stock", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          quantity: Number(form.quantity), // ensure quantity is numeric
-        }),
+        body: JSON.stringify(form),
       });
-
-      if (!res.ok) {
-        throw new Error("Failed to save stock movement");
-      }
-
-      // Reset form and close modal
       setForm({ productId: "", type: "in", quantity: "" });
       setShowModal(false);
-      fetchMovements(); // Refresh stock movements list
+      fetchMovements();
     } catch (err) {
       console.error("Error saving stock movement:", err);
     }
   };
 
-  // Render component UI
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">Manage Stock</h2>
+    <div className="min-h-screen bg-gray-100 p-8">
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-bold text-gray-700">Manage Stock Movements</h2>
         <button
-          onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          onClick={() => {
+            setForm({ productId: "", type: "in", quantity: "" });
+            setShowModal(true);
+          }}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded"
         >
           Add Stock Movement
         </button>
       </div>
 
-      {/* Render Table component with stock movements data */}
       <Table
-        data={movements.map((item) => ({
-          ...item,
-          date: new Date(item.date).toLocaleString("en-US", {
-            dateStyle: "medium",
-            timeStyle: "short",
-          }),
-        }))}
+        data={movements}
         columns={[
           { key: "productName", label: "Product" },
           { key: "type", label: "Type" },
@@ -103,7 +88,6 @@ const Stock = () => {
         ]}
       />
 
-      {/* Render Modal component for stock movement form */}
       <Modal
         isOpen={showModal}
         title="Add Stock Movement"
@@ -115,7 +99,7 @@ const Stock = () => {
             value={form.productId}
             onChange={handleChange}
             required
-            className="w-full border p-2"
+            className="w-full border p-2 rounded"
           >
             <option value="">Select Product</option>
             {products.map((product) => (
@@ -130,7 +114,7 @@ const Stock = () => {
             value={form.type}
             onChange={handleChange}
             required
-            className="w-full border p-2"
+            className="w-full border p-2 rounded"
           >
             <option value="in">Stock In</option>
             <option value="out">Stock Out</option>
@@ -143,12 +127,11 @@ const Stock = () => {
             value={form.quantity}
             onChange={handleChange}
             required
-            className="w-full border p-2"
+            className="w-full border p-2 rounded"
           />
-
           <button
             type="submit"
-            className="bg-green-600 text-white px-4 py-2 rounded"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full"
           >
             Save
           </button>
@@ -158,5 +141,4 @@ const Stock = () => {
   );
 };
 
-// Export Stock component as default export
 export default Stock;

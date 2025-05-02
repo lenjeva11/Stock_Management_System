@@ -12,13 +12,15 @@ router.get("/", async (req, res) => {
   try {
     // Find all stock movements and populate product details
     const movements = await Stock.find().populate("productId");
+    // Filter out stock movements with missing productId (deleted products)
+    const filtered = movements.filter(m => m.productId !== null);
     // Format the movements for response
-    const formatted = movements.map((m) => ({
-      _id: m._id, // Movement ID
-      productName: m.productId?.name || "Unknown", // Product name or Unknown
-      type: m.type, // Movement type (in/out)
-      quantity: m.quantity, // Quantity moved
-      date: m.date, // Date of movement
+    const formatted = filtered.map((m) => ({
+      _id: m._id, // Movement ID+
+      productName: m.productId.name, 
+      type: m.type, 
+      quantity: m.quantity, 
+      date: m.date, 
     }));
 
     // Send formatted movements as JSON response

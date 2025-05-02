@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
-const Login = () => {
+const Signup = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ username: "", password: "" });
 
@@ -11,26 +11,26 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+      const res = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
       if (res.ok) {
-        navigate("/dashboard");
+        navigate("/login");
       } else {
-        alert("Invalid credentials!");
+        alert("Signup failed!");
       }
     } catch (err) {
-      console.error("Login failed:", err);
+      console.error("Signup failed:", err);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">Admin Login</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-700">Signup</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             name="username"
@@ -51,17 +51,17 @@ const Login = () => {
           />
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded w-full"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded w-full"
           >
-            Login
+            Signup
           </button>
         </form>
 
         <div className="text-center mt-4">
           <p className="text-gray-500">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-blue-600 hover:underline">
-              Signup
+            Already have an account?{" "}
+            <Link to="/login" className="text-blue-600 hover:underline">
+              Login
             </Link>
           </p>
         </div>
@@ -70,4 +70,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;

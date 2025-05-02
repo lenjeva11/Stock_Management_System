@@ -21,10 +21,10 @@ mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log('MongoDB connected successfully'));
 
 // Set up API routes with specific URL prefixes
-app.use('/api/auth', authRoutes); // Routes for authentication
-app.use('/api/users', userRoutes); // Routes for user management
-app.use('/api/products', productRoutes); // Routes for product management
-app.use('/api/stock', stockRoutes); // Routes for stock management
+app.use('/api/auth', authRoutes); 
+app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes); 
+app.use('/api/stock', stockRoutes); 
 
 // Start the server on port 5000
 app.listen(5000, () => console.log("Server is running on port 5000"));

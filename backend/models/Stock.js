@@ -27,5 +27,4 @@ const StockSchema = new mongoose.Schema({
   },
 });
 
-// Export the Stock model based on StockSchema
 module.exports = mongoose.model("Stock", StockSchema);
