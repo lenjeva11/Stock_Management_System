@@ -1,10 +1,6 @@
-// Import express framework
 const express = require("express");
-// Create a new router object
 const router = express.Router();
-// Import Stock model
 const Stock = require("../models/Stock");
-// Import Product model
 const Product = require("../models/Product");
 
 // GET all stock movements

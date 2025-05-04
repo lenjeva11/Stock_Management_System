@@ -10,11 +10,5 @@ const ProductSchema = new mongoose.Schema({
   price: Number,
 });
 
-// Middleware to delete stock movements linked to the product
-ProductSchema.pre("findOneAndDelete", async function (next) {
-  const productId = this.getQuery()["_id"];
-  await Stock.deleteMany({ product: productId });
-  next();
-});
 
 module.exports = mongoose.model("Product", ProductSchema);
